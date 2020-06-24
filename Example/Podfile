@@ -1,0 +1,11 @@
+use_frameworks!
+
+target 'SwiftSVGA_Example' do
+  pod 'SwiftSVGA', :path => '../'
+
+  target 'SwiftSVGA_Tests' do
+    inherit! :search_paths
+
+    pod 'FBSnapshotTestCase' , '~> 2.1.4'
+  end
+end
