@@ -9,6 +9,11 @@ import UIKit
 import QuartzCore
 
 open class SVGAView: UIView {
+    public typealias OnDidLoadHandle = ((_ view: SVGAView, _ svga: SVGAMovieEntity?) -> Void)
+    public typealias OnUpdateHandle = ((_ view: SVGAView, _ curIndex: Int, _ curLoop: Int) -> Void)
+    public typealias OnAnimatingChangeHandle = ((_ view: SVGAView, _ new:Bool, _ old: Bool) -> Void)
+    public typealias OnPlayFinshedHandle = ((_ view: SVGAView, _ loop:Int) -> Void)
+    
     public class WeakLinkDelegate: NSObject {
         weak var base: SVGAView?
         init(_ base: SVGAView?) {
@@ -26,7 +31,7 @@ open class SVGAView: UIView {
         return layer
     }()
     public private(set) var spriteLayers: [SVGASpriteLayer] = []
-    public var spriteLayersReuses: [SVGASpriteLayer] = []
+    public private(set) var spriteLayersReuses: [SVGASpriteLayer] = []
     
     open private(set) var dynamicImages: [String: UIImage] = [:]
     open private(set) var dynamicHiddens: [String: Bool] = [:]
@@ -37,14 +42,26 @@ open class SVGAView: UIView {
     open private(set) var curIndex: Int = 0
     open private(set) var curLoop: Int = 0
     open private(set) var totalFrameCount: Int = 0
-    open private(set) var isAnimating: Bool = false
+    open private(set) var isAnimating: Bool = false {
+        didSet {
+            if isAnimating != oldValue {
+                self.onAnimatingChangeHandle?(self, isAnimating, oldValue)
+            }
+        }
+    }
     
     open private(set) var url: URL?
     open private(set) var task: SVGAManager.LoadTask?
     
+    open var onDidLoadHandle: OnDidLoadHandle?
+    open var onDidUpdateHandle: OnUpdateHandle?
+    open var onAnimatingChangeHandle: OnAnimatingChangeHandle?
+    open var onPlayFinshedHandle: OnPlayFinshedHandle?
+    
     open var movieEntity: SVGAMovieEntity? {
         didSet {
             reset()
+            self.onDidLoadHandle?(self, movieEntity)
         }
     }
     
@@ -131,14 +148,17 @@ open class SVGAView: UIView {
         if isAnimating { return }
         if index >= totalFrameCount { return }
         
+        var needUpdate = false
         if drawLayer.superlayer == nil {
             self.layer.addSublayer(drawLayer)
+            needUpdate = true
         }
         
+        needUpdate = (curIndex != index)
         isAnimating = true
         curIndex = index
         curLoop = 0
-        update()
+        if needUpdate { update() }
         displayLink?.isPaused = false
     }
     
@@ -177,13 +197,17 @@ open class SVGAView: UIView {
         case .clear:
             drawLayer.removeFromSuperlayer()
         }
+        
+        self.onPlayFinshedHandle?(self, curLoop)
     }
     
     open func moveFrame(to index: Int, play: Bool = false) {
         if index >= totalFrameCount || index == self.curIndex { return }
+        
         if drawLayer.superlayer == nil {
             self.layer.addSublayer(drawLayer)
         }
+        
         curIndex = index
         update()
         
@@ -198,6 +222,7 @@ open class SVGAView: UIView {
             layer.step(index: curIndex)
         }
         CATransaction.setDisableActions(false)
+        self.onDidUpdateHandle?(self, curIndex, curLoop)
     }
     
     open func resize() {

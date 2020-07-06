@@ -24,13 +24,16 @@ class ViewController: UIViewController {
         let url = Bundle.main.url(forResource: "rose", withExtension: "svga")
         svgaView.setURL(url)
         
-//        let data = try? Data(contentsOf: url!)
-//        do {
-//            let svga = try SVGAMovieEntity(data: data!)
-//            svgaView.movieEntity = svga
-//        } catch {
-//            print(error)
-//        }
+        svgaView.totalLoop = 10
+        svgaView.onDidUpdateHandle = { (view, curIndex, curLoop) in
+            print("--> update curIndex: \(curIndex) curLoop: \(curLoop)")
+        }
+        
+        svgaView.onPlayFinshedHandle = { (view, loop) in
+            print("--> finshed loop: \(loop)")
+        }
+        
+        svgaView.fillModel = .backwards
     }
 
     override func didReceiveMemoryWarning() {

@@ -9,9 +9,9 @@ import Foundation
 
 public typealias CompletionHandler = ((_ svga: SVGAMovieEntity?, _ error: Error?, _ url: URL) -> Void)
 
-public class SVGAManager: NSObject {
+open class SVGAManager: NSObject {
     public static let shared = SVGAManager()
-    public lazy var session: URLSession = {
+    open lazy var session: URLSession = {
         let path =  "/com.swift.svga.cache"
         let cache = URLCache(memoryCapacity: 1024 * 1024 * 10, diskCapacity: 1024 * 1024 * 500, diskPath: path)
         let config = URLSessionConfiguration.default
@@ -23,16 +23,16 @@ public class SVGAManager: NSObject {
     }()
     
     public let cache: NSCache = NSCache<NSString, SVGAMovieEntity>()
-    private var unionTaskCache = UnionTaskCache()
+    public private(set) var unionTaskCache = UnionTaskCache()
     
     
-    public func download(urlString: String?, handle: @escaping CompletionHandler) -> LoadTask? {
+    open func download(urlString: String?, handle: @escaping CompletionHandler) -> LoadTask? {
         guard let urlString = urlString else { return nil }
         guard let url = URL(string: urlString) else { return nil }
         return download(url: url, handle: handle)
     }
     
-    public func download(url: URL?, handle: @escaping CompletionHandler) -> LoadTask? {
+    open func download(url: URL?, handle: @escaping CompletionHandler) -> LoadTask? {
         guard let tURL = url else { return nil }
         let key: NSString = tURL.absoluteString as NSString
         let svga = self.cache.object(forKey: key)
@@ -71,12 +71,11 @@ public class SVGAManager: NSObject {
         loadTask = unionTaskCache.fetch(for: key, handle: handle, task: task)
         task.resume()
         return loadTask
-        
     }
 }
 
 extension SVGAManager {
-    class UnionTaskCache {
+    public class UnionTaskCache {
         var unionTaskCache: [NSString: UnionTask] = [:]
         var lock = NSLock()
         
