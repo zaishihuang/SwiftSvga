@@ -86,7 +86,7 @@ extension SVGAManager {
         func fetch(for key: NSString, handle:@escaping CompletionHandler, task: URLSessionTask?) -> LoadTask? {
             var unionTask = get(for: key)
             if unionTask == nil && task != nil {
-                unionTask = UnionTask(task: task!, lock: lock)
+                unionTask = UnionTask(task: task!, key: key, lock: lock)
                 set(contextTask: unionTask, key: key)
             }
             return unionTask?.enqueue(handle: handle)
@@ -108,6 +108,9 @@ extension SVGAManager {
         func set(contextTask: UnionTask?, key: NSString) {
             lock.lock()
             if contextTask != nil {
+                contextTask?.onCancelHandle = {[weak self] tKey in
+                    self?.set(contextTask: nil, key: tKey)
+                }
                 unionTaskCache[key] = contextTask!
             } else {
                 unionTaskCache.removeValue(forKey: key)
@@ -136,11 +139,14 @@ extension SVGAManager {
     }
     
     public class UnionTask {
+        var key: NSString
         var sessionTask: URLSessionTask?
         var callBackTasks: [LoadTask] = []
+        var onCancelHandle: ((_ key:NSString) -> Void)?
         var lock: NSLock
         
-        init(task: URLSessionTask, lock: NSLock) {
+        init(task: URLSessionTask, key: NSString, lock: NSLock) {
+            self.key = key
             sessionTask = task
             self.lock = lock
         }
@@ -160,6 +166,7 @@ extension SVGAManager {
             }
             if callBackTasks.count == 0 {
                 sessionTask?.cancel()
+                self.onCancelHandle?(self.key)
             }
             lock.unlock()
         }
