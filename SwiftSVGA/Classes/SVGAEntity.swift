@@ -37,7 +37,9 @@ open class SVGAFrameEntity {
     open var nx: CGFloat = 0
     open var ny: CGFloat = 0
     open var clipPath: String = ""
-    open var clipBezierPath: UIBezierPath?
+    open lazy var clipBezierPath: UIBezierPath? = {
+       return UIBezierPath(svgaPaths: clipPath)
+    }()
     
     init?(pb: Svga_FrameEntity) {
         alpha = CGFloat(pb.alpha)
@@ -52,7 +54,7 @@ open class SVGAFrameEntity {
                                       tx: CGFloat(pb.transform.tx),
                                       ty: CGFloat(pb.transform.ty))
         clipPath = pb.clipPath
-        clipBezierPath = UIBezierPath(svgaPaths: clipPath)
+        //clipBezierPath = UIBezierPath(svgaPaths: clipPath)
         
         shapes = pb.shapes.compactMap({ (pbShape) -> SVGAShapeEntity? in
             return SVGAShapeEntity(pb: pbShape)
@@ -81,18 +83,21 @@ open class SVGAShapeEntity {
     
     public struct ShapeArgs {
         public var d: String = ""
-        public var bezierPath: UIBezierPath?
+        public lazy var bezierPath: UIBezierPath? = {
+            return UIBezierPath(svgaPaths: d)
+        }()
         
         init(d: String) {
             self.d = d
-            bezierPath = UIBezierPath(svgaPaths: d)
         }
     }
     
     public struct RectArgs {
         public var rect: CGRect = .zero
         public var cornerRadius: CGFloat = 0
-        public var bezierPath: UIBezierPath
+        public lazy var bezierPath: UIBezierPath? = {
+            return UIBezierPath(roundedRect: rect, cornerRadius: cornerRadius)
+        }()
         
         init?(pb: Svga_ShapeEntity.RectArgs) {
             rect = CGRect(x: CGFloat(pb.x),
@@ -100,7 +105,6 @@ open class SVGAShapeEntity {
                           width: CGFloat(pb.width),
                           height: CGFloat(pb.height))
             cornerRadius = CGFloat(pb.cornerRadius)
-            bezierPath = UIBezierPath(roundedRect: rect, cornerRadius: cornerRadius)
         }
     }
     
@@ -108,15 +112,15 @@ open class SVGAShapeEntity {
         public var center: CGPoint = .zero
         public var radiusX: CGFloat = 0
         public var radiusY: CGFloat = 0
-        public var bezierPath: UIBezierPath
+        public lazy var bezierPath: UIBezierPath = {
+            return UIBezierPath(ovalIn: CGRect(x: center.x - radiusX, y: center.y - radiusY, width: radiusX * 2, height: radiusY * 2))
+        }()
         
         init?(pb: Svga_ShapeEntity.EllipseArgs) {
             center = CGPoint(x: CGFloat(pb.x),
                            y: CGFloat(pb.y))
             radiusX = CGFloat(pb.radiusX)
             radiusY = CGFloat(pb.radiusY)
-            
-            bezierPath = UIBezierPath(ovalIn: CGRect(x: center.x - radiusX, y: center.y - radiusY, width: radiusX * 2, height: radiusY * 2))
         }
     }
     
@@ -162,20 +166,29 @@ open class SVGAShapeEntity {
     open var ellipse: EllipseArgs?
     open var styles: ShapeStyle?
     open var transform: CGAffineTransform = .identity
-    open var bezierPath: UIBezierPath?
+    open lazy var bezierPath: UIBezierPath? = {
+        var bezierPath:UIBezierPath?
+        switch type {
+        case .shape:
+            bezierPath = shape?.bezierPath
+        case .rect:
+            bezierPath = rect?.bezierPath
+        case .ellipse:
+            bezierPath = ellipse?.bezierPath
+        default:break
+        }
+        return bezierPath
+    }()
     
     init?(pb: Svga_ShapeEntity) {
         type = ShapeType(rawValue: pb.type.rawValue) ?? .shape
         switch type {
         case .shape:
             shape = ShapeArgs(d: pb.shape.d)
-            bezierPath = shape?.bezierPath
         case .rect:
             rect = RectArgs(pb: pb.rect)
-            bezierPath = rect?.bezierPath
         case .ellipse:
             ellipse = EllipseArgs(pb: pb.ellipse)
-            bezierPath = ellipse?.bezierPath
         default:break
         }
         
@@ -262,8 +275,9 @@ open class SVGAMovieEntity {
 }
 
 extension UIBezierPath {
-//    static let validMethods: Set<String> = ["M","L","H","V","C","S","Q","R","A","Z"]
-    convenience init?(svgaPaths: String) {
+//    static let validMethods: Set<String> = ["M","L","H","V","C","S","Q","R","A","Z",
+//    "m","l","h","v","c","s","q","r","a","z"]
+    public convenience init?(svgaPaths: String) {
         guard svgaPaths.count > 0 else { return nil }
         self.init()
         self.setSVGAPaths(svgaPaths)

@@ -24,7 +24,7 @@ open class SVGAManager: NSObject {
     
     public let cache: NSCache = NSCache<NSString, SVGAMovieEntity>()
     public private(set) var unionTaskCache = UnionTaskCache()
-    
+    public let processQueue = DispatchQueue(label: "com.swift.svga.manager.process", attributes: .concurrent)
     
     open func download(urlString: String?, handle: @escaping CompletionHandler) -> LoadTask? {
         guard let urlString = urlString else { return nil }
@@ -51,20 +51,24 @@ open class SVGAManager: NSObject {
         let cachePolicy: URLRequest.CachePolicy = tURL.isFileURL ? .reloadIgnoringCacheData : .returnCacheDataElseLoad
         let req = URLRequest(url: tURL, cachePolicy: cachePolicy, timeoutInterval: 60)
         let task = session.dataTask(with: req) { [weak self] (data, response, error) in
-            let unionTask = self?.unionTaskCache.pod(for: key)
             if error != nil {
+                let unionTask = self?.unionTaskCache.pod(for: key)
                 unionTask?.finshed(svga: nil, error: error, url: tURL)
                 return
             }
-
-            do {
-                let svga = data != nil ? try SVGAMovieEntity(data: data!) : nil
-                if svga != nil {
-                    self?.cache.setObject(svga!, forKey: key)
+            
+            self?.processQueue.async {
+                do {
+                    let svga = data != nil ? try SVGAMovieEntity(data: data!) : nil
+                    if svga != nil {
+                        self?.cache.setObject(svga!, forKey: key)
+                    }
+                    let unionTask = self?.unionTaskCache.pod(for: key)
+                    unionTask?.finshed(svga: svga, error: error, url: tURL)
+                } catch {
+                    let unionTask = self?.unionTaskCache.pod(for: key)
+                    unionTask?.finshed(svga: nil, error: error, url: tURL)
                 }
-                unionTask?.finshed(svga: svga, error: error, url: tURL)
-            } catch {
-                unionTask?.finshed(svga: nil, error: error, url: tURL)
             }
         }
         

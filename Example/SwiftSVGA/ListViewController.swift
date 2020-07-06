@@ -15,6 +15,7 @@ class Cell: UICollectionViewCell {
         view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         self.contentView.addSubview(view)
         self.contentView.layer.borderWidth = 2
+        self.contentView.layer.borderColor = UIColor.white.cgColor
         return view
     }()
     
@@ -27,7 +28,6 @@ class Cell: UICollectionViewCell {
 class ListViewController: UIViewController {
 
     lazy var items: [String] = [
-        "https://cdn.waka.media/wakam/147016ec686e7cbf2196917697b89fbd",
                                "https://github.com/yyued/SVGA-Samples/blob/master/EmptyState.svga?raw=true",
                                "http://github.com/yyued/SVGA-Samples/blob/master/HamburgerArrow.svga?raw=true",
                                "https://github.com/yyued/SVGA-Samples/blob/master/PinJump.svga?raw=true",
@@ -59,12 +59,14 @@ class ListViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.view.backgroundColor = UIColor.black
         self.view.addSubview(collectionView)
     }
 }
 
 extension ListViewController: UICollectionViewDataSource, UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+//        return 2
         return self.items.count
     }
     

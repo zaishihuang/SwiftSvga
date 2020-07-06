@@ -25,9 +25,10 @@ open class SVGAView: UIView {
     }
     
     public private(set) var displayLink: CADisplayLink?
-    public private(set) var drawLayer: CALayer = {
+    public private(set) lazy var drawLayer: CALayer = {
         let layer = CALayer()
         layer.masksToBounds = true
+        self.layer.addSublayer(layer)
         return layer
     }()
     public private(set) var spriteLayers: [SVGASpriteLayer] = []
@@ -60,7 +61,11 @@ open class SVGAView: UIView {
     
     open var movieEntity: SVGAMovieEntity? {
         didSet {
+            CATransaction.begin()
+            CATransaction.setDisableActions(true)
             reset()
+            CATransaction.commit()
+            
             self.onDidLoadHandle?(self, movieEntity)
         }
     }
@@ -78,6 +83,9 @@ open class SVGAView: UIView {
     deinit {
         displayLink?.isPaused = true
         displayLink = nil
+        if task != nil {
+            cancelLoading()
+        }
     }
     
     override open func layoutSubviews() {
@@ -105,10 +113,9 @@ open class SVGAView: UIView {
         curLoop = 0
         curIndex = 0
         totalFrameCount = movieEntity?.frames ?? 0
-        
-        self.layer.addSublayer(drawLayer)
-        drawLayer.transform = CATransform3DIdentity
-        drawLayer.frame = CGRect(origin: .zero, size: movieEntity?.size ?? .zero)
+    
+        drawLayer.isHidden = (movieEntity == nil)
+        resize()
         
         if movieEntity != nil {
             spriteLayers = movieEntity?.sprites.compactMap({ (spriteEntity) -> SVGASpriteLayer? in
@@ -127,7 +134,6 @@ open class SVGAView: UIView {
                 return layer
             }) ?? []
 
-            resize()
             update()
             
             if displayLink == nil {
@@ -148,13 +154,8 @@ open class SVGAView: UIView {
         if isAnimating { return }
         if index >= totalFrameCount { return }
         
-        var needUpdate = false
-        if drawLayer.superlayer == nil {
-            self.layer.addSublayer(drawLayer)
-            needUpdate = true
-        }
-        
-        needUpdate = needUpdate || (curIndex != index)
+        let needUpdate = drawLayer.isHidden || (curIndex != index)
+        drawLayer.isHidden = false
         isAnimating = true
         curIndex = index
         curLoop = 0
@@ -195,7 +196,7 @@ open class SVGAView: UIView {
         case .backwards:
             moveFrame(to: 0)
         case .clear:
-            drawLayer.removeFromSuperlayer()
+            drawLayer.isHidden = true
         }
         
         self.onPlayFinshedHandle?(self, curLoop)
@@ -203,11 +204,8 @@ open class SVGAView: UIView {
     
     open func moveFrame(to index: Int, play: Bool = false) {
         if index >= totalFrameCount || index == self.curIndex { return }
-        
-        if drawLayer.superlayer == nil {
-            self.layer.addSublayer(drawLayer)
-        }
-        
+
+        drawLayer.isHidden = false
         curIndex = index
         update()
         
@@ -217,16 +215,20 @@ open class SVGAView: UIView {
     }
     
     open func update() {
+        CATransaction.begin()
         CATransaction.setDisableActions(true)
         self.spriteLayers.forEach { layer in
             layer.step(index: curIndex)
         }
-        CATransaction.setDisableActions(false)
+        CATransaction.commit()
         self.onDidUpdateHandle?(self, curIndex, curLoop)
     }
     
     open func resize() {
-        guard let movieEntity = self.movieEntity else { return }
+        guard let movieEntity = self.movieEntity else {
+            drawLayer.frame = CGRect.zero
+            return
+        }
         
         let size = self.bounds.size
         let videoSize = movieEntity.size

@@ -20,16 +20,25 @@
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="K0z-Zy-ruo">
-                                <rect key="frame" x="164" y="530" width="46" height="30"/>
+                                <rect key="frame" x="164.5" y="530" width="46" height="30"/>
                                 <state key="normal" title="Button"/>
                                 <connections>
                                     <segue destination="PIm-uH-j9h" kind="push" id="kVU-nl-Dyh"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ncg-E9-qJ1">
+                                <rect key="frame" x="75" y="530" width="46" height="30"/>
+                                <state key="normal" title="Button"/>
+                                <connections>
+                                    <action selector="onTapChange:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="c8G-k3-jwa"/>
                                 </connections>
                             </button>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="K0z-Zy-ruo" firstAttribute="centerX" secondItem="kh9-bI-dsS" secondAttribute="centerX" id="6aT-BK-ork"/>
+                            <constraint firstItem="K0z-Zy-ruo" firstAttribute="leading" secondItem="Ncg-E9-qJ1" secondAttribute="trailing" constant="43.5" id="Pqs-ZN-zuY"/>
+                            <constraint firstItem="Ncg-E9-qJ1" firstAttribute="baseline" secondItem="K0z-Zy-ruo" secondAttribute="baseline" id="Zgn-rz-0wi"/>
                             <constraint firstItem="2fi-mo-0CV" firstAttribute="top" secondItem="K0z-Zy-ruo" secondAttribute="bottom" constant="107" id="coA-7O-FEs"/>
                         </constraints>
                     </view>
