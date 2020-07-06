@@ -154,7 +154,7 @@ open class SVGAView: UIView {
             needUpdate = true
         }
         
-        needUpdate = (curIndex != index)
+        needUpdate = needUpdate || (curIndex != index)
         isAnimating = true
         curIndex = index
         curLoop = 0
