@@ -1,7 +1,9 @@
+platform :ios, '9.0'
 use_frameworks!
 
 target 'SwiftSVGA_Example' do
   pod 'SwiftSVGA', :path => '../'
+  pod 'Reveal-SDK','~>24', :configurations => ['Debug']
 
   target 'SwiftSVGA_Tests' do
     inherit! :search_paths

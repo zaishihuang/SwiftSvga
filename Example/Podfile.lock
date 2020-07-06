@@ -1,0 +1,35 @@
+PODS:
+  - FBSnapshotTestCase (2.1.4):
+    - FBSnapshotTestCase/SwiftSupport (= 2.1.4)
+  - FBSnapshotTestCase/Core (2.1.4)
+  - FBSnapshotTestCase/SwiftSupport (2.1.4):
+    - FBSnapshotTestCase/Core
+  - Reveal-SDK (24)
+  - SwiftProtobuf (1.9.0)
+  - SwiftSVGA (0.1.0):
+    - SwiftProtobuf
+
+DEPENDENCIES:
+  - FBSnapshotTestCase (~> 2.1.4)
+  - Reveal-SDK (~> 24)
+  - SwiftSVGA (from `../`)
+
+SPEC REPOS:
+  trunk:
+    - FBSnapshotTestCase
+    - Reveal-SDK
+    - SwiftProtobuf
+
+EXTERNAL SOURCES:
+  SwiftSVGA:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  FBSnapshotTestCase: 094f9f314decbabe373b87cc339bea235a63e07a
+  Reveal-SDK: 5d7e56b8f018c0a88b3a2c10bf68d598bbd3b071
+  SwiftProtobuf: ecbec1be9036d15655f6b3443a1c4ea693c97932
+  SwiftSVGA: ba6dbb3b27b7f752b63da1140a2bf7a9fc631a90
+
+PODFILE CHECKSUM: 29b4f0a1619c2bb58426f7c9942da67060120665
+
+COCOAPODS: 1.9.3
