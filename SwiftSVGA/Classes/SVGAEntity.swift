@@ -7,6 +7,7 @@
 
 import Foundation
 import QuartzCore
+import ZIPFoundation
 
 open class SVGASpriteEntity {
     /// 元件所对应的位图键名, 如果 imageKey 含有 .vector 后缀，该 sprite 为矢量图层 含有 .matte 后缀，该 sprite 为遮罩图层。
@@ -47,12 +48,12 @@ open class SVGAFrameEntity {
                         y: CGFloat(pb.layout.y),
                         width: CGFloat(pb.layout.width),
                         height: CGFloat(pb.layout.height))
-        transform = CGAffineTransform(a: CGFloat(pb.transform.a),
+        transform = pb.hasTransform ? CGAffineTransform(a: CGFloat(pb.transform.a),
                                       b: CGFloat(pb.transform.b),
                                       c: CGFloat(pb.transform.c),
                                       d: CGFloat(pb.transform.d),
                                       tx: CGFloat(pb.transform.tx),
-                                      ty: CGFloat(pb.transform.ty))
+                                      ty: CGFloat(pb.transform.ty)) : .identity
         clipPath = pb.clipPath
         //clipBezierPath = UIBezierPath(svgaPaths: clipPath)
         
@@ -233,19 +234,88 @@ open class SVGAMovieEntity {
     open var audios: [SVGAAudioEntity] = []  // 音频列表
 
     public convenience init(fileURL: URL) throws {
+        var isDir: ObjCBool = false
+        FileManager.default.fileExists(atPath: fileURL.path, isDirectory: &isDir)
+        if isDir.boolValue {
+            let pbURL = fileURL.appendingPathComponent("movie.binary")
+            let pbData = try Data(contentsOf: pbURL)
+            let pb = try Svga_MovieEntity.init(serializedData: pbData)
+            self.init(pb: pb, inDirURL: fileURL)
+        }
+        
         let data = try Data(contentsOf: fileURL)
-        try self.init(data: data)
+        try self.init(data: data, fileURL: fileURL)
     }
     
-    public init(data: Data) throws {
-        let nData = data.zlibInflate()
-        let pb = try Svga_MovieEntity.init(serializedData: nData)
+    
+    /// convenience init
+    /// - Parameters:
+    ///   - data: svga data
+    ///   - fileURL: data store url use for 1.x
+    public convenience init(data: Data, fileURL: URL? = nil) throws {
+        let tag = data.count > 4 ? data.prefix(4) : Data()
+        let tagStr = tag.map { String(format: "%02.2hhx", $0) }.joined()
+        if tagStr != "504b0304" {
+            let nData = data.zlibInflate()
+            let pb = try Svga_MovieEntity.init(serializedData: nData)
+            self.init(pb: pb)
+            return
+        }
+        
+        /// 1.x
+        let storeURL: URL = {
+            if fileURL != nil { return fileURL! }
+            let key = data.md5String()
+            let tmpPath = NSTemporaryDirectory() + "/\(key).svga"
+            let tmpURL = URL(fileURLWithPath: tmpPath)
+            return tmpURL
+        }()
+        
+        if !FileManager.default.fileExists(atPath: storeURL.path) {
+            try data.write(to: storeURL)
+        }
+        
+        let tmpUnzipURL: URL = {
+            var url: URL!
+            if storeURL.path.hasPrefix(NSHomeDirectory()) {
+                url = storeURL.appendingPathExtension("unzip.tmp")
+            } else {
+                let key = storeURL.absoluteString.md5String()
+                url = URL(fileURLWithPath: "\(NSTemporaryDirectory())/\(key).svga.unzip.tmp")
+            }
+            return url
+        }()
+        
+        if !FileManager.default.fileExists(atPath: tmpUnzipURL.path) {
+            try FileManager.default.unzipItem(at: storeURL, to: tmpUnzipURL)
+        }
+        
+        let pbURL = tmpUnzipURL.appendingPathComponent("movie.binary")
+        let pbData = try Data(contentsOf: pbURL)
+        let pb = try Svga_MovieEntity.init(serializedData: pbData)
+        self.init(pb: pb, inDirURL: tmpUnzipURL)
+    }
+    
+    init(pb: Svga_MovieEntity, inDirURL:URL? = nil) {
         version = pb.version
         size = CGSize(width: CGFloat(pb.params.viewBoxWidth), height: CGFloat(pb.params.viewBoxHeight))
         fps = Int(pb.params.fps)
         frames = Int(pb.params.frames)
         
+        let dirExist = inDirURL != nil ? FileManager.default.fileExists(atPath: inDirURL!.path) : false
+        
         images = pb.images.compactMapValues({ (data) -> UIImage? in
+            if dirExist {
+                let fileName = String(data: data, encoding: .utf8) ?? ""
+                let fileURL = inDirURL!.appendingPathComponent("\(fileName).png")
+                let imageData = try? Data(contentsOf: fileURL)
+                if imageData != nil {
+                    imagesTotalSize += data.count
+                    let image = UIImage(data: imageData!, scale: UIScreen.main.scale)
+                    return image
+                }
+            }
+            
             imagesTotalSize += data.count
             return UIImage(data: data, scale: UIScreen.main.scale)
         })

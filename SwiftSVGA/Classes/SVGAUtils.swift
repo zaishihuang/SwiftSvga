@@ -75,3 +75,10 @@ extension Data {
         return digestHex
     }
 }
+
+extension String {
+    func md5String() -> String {
+        let data = self.data(using: .utf8)
+        return data?.md5String() ?? ""
+    }
+}

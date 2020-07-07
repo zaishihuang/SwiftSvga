@@ -34,7 +34,8 @@ open class SVGAManager: NSObject {
     
     open func download(url: URL?, handle: @escaping CompletionHandler) -> LoadTask? {
         guard let tURL = url else { return nil }
-        let key: NSString = tURL.absoluteString as NSString
+        
+        let key: NSString = tURL.absoluteString.md5String() as NSString
         let svga = self.cache.object(forKey: key)
         if svga != nil {
             DispatchQueue.main.async {
@@ -43,36 +44,60 @@ open class SVGAManager: NSObject {
             return nil
         }
         
-        var loadTask = unionTaskCache.fetch(for: key, handle: handle, task: nil)
-        if loadTask != nil {
-            return loadTask
+        let unionTask = unionTaskCache.get(for: key)
+        if unionTask != nil {
+            return unionTask?.enqueue(handle: handle)
         }
         
-        let cachePolicy: URLRequest.CachePolicy = tURL.isFileURL ? .reloadIgnoringCacheData : .returnCacheDataElseLoad
-        let req = URLRequest(url: tURL, cachePolicy: cachePolicy, timeoutInterval: 60)
-        let task = session.dataTask(with: req) { [weak self] (data, response, error) in
-            if error != nil {
-                let unionTask = self?.unionTaskCache.pod(for: key)
-                unionTask?.finshed(svga: nil, error: error, url: tURL)
+        if tURL.isFileURL {
+            return loadLocal(url: tURL, key: key, handle: handle)
+        }
+        
+        let loadTask = self.downloadRemote(url: tURL, key: key, handle: handle)
+        return loadTask
+    }
+    
+    func loadLocal(url: URL, key: NSString, handle: CompletionHandler?) -> LoadTask? {
+        guard url.isFileURL == true else { return nil }
+        
+        let unionTask = unionTaskCache.obtained(for: key)
+        let loadTask = handle != nil ? unionTask.enqueue(handle: handle) : nil
+        
+        self.processQueue.async {
+            let unionTask = self.unionTaskCache.get(for: key)
+            if (unionTask == nil) {
                 return
             }
             
-            self?.processQueue.async {
-                do {
-                    let svga = data != nil ? try SVGAMovieEntity(data: data!) : nil
-                    if svga != nil {
-                        self?.cache.setObject(svga!, forKey: key)
-                    }
-                    let unionTask = self?.unionTaskCache.pod(for: key)
-                    unionTask?.finshed(svga: svga, error: error, url: tURL)
-                } catch {
-                    let unionTask = self?.unionTaskCache.pod(for: key)
-                    unionTask?.finshed(svga: nil, error: error, url: tURL)
-                }
+            do {
+                let svga = try SVGAMovieEntity(fileURL: url)
+                self.cache.setObject(svga, forKey: key)
+                
+                unionTask?.finshed(svga: svga, error: nil, url: url)
+            } catch {
+                unionTask?.finshed(svga: nil, error: error, url: url)
             }
         }
         
-        loadTask = unionTaskCache.fetch(for: key, handle: handle, task: task)
+        return loadTask
+    }
+    
+    func downloadRemote(url: URL, key: NSString, handle: @escaping CompletionHandler) -> LoadTask? {
+        let key = url.absoluteString.md5String() as NSString
+        let req = URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad, timeoutInterval: 60)
+        
+        let unionTask = unionTaskCache.obtained(for: key)
+        let loadTask = unionTask.enqueue(handle: handle)
+        
+        let task = session.downloadTask(with: req) { (fileURL, rsp, error) in
+            if fileURL != nil {
+                unionTask.sessionTask = nil
+                _ = self.loadLocal(url: fileURL!, key: key, handle: nil)
+            } else {
+                unionTask.finshed(svga: nil, error: error, url: url)
+            }
+        }
+        unionTask.sessionTask = task
         task.resume()
         return loadTask
     }
@@ -83,19 +108,13 @@ extension SVGAManager {
         var unionTaskCache: [NSString: UnionTask] = [:]
         var lock = NSLock()
         
-        func fetch(for key: NSString, handle:@escaping CompletionHandler, task: URLSessionTask?) -> LoadTask? {
-            var unionTask = get(for: key)
-            if unionTask == nil && task != nil {
-                unionTask = UnionTask(task: task!, key: key, lock: lock)
-                set(contextTask: unionTask, key: key)
+        func obtained(for key: NSString) -> UnionTask {
+            var task = self.get(for: key)
+            if task == nil {
+                task = UnionTask(key: key, lock: self.lock)
+                set(task, key: key)
             }
-            return unionTask?.enqueue(handle: handle)
-        }
-        
-        func pod(for key: NSString) -> UnionTask? {
-            let task = self.get(for: key)
-            set(contextTask: nil, key: key)
-            return task
+            return task!
         }
         
         func get(for key: NSString) -> UnionTask? {
@@ -105,22 +124,18 @@ extension SVGAManager {
             return contextTask
         }
         
-        func set(contextTask: UnionTask?, key: NSString) {
+        func set(_ unionTask: UnionTask?, key: NSString) {
             lock.lock()
-            if contextTask != nil {
-                contextTask?.onCancelHandle = {[weak self] tKey in
-                    self?.set(contextTask: nil, key: tKey)
+            if unionTask != nil {
+                unionTask?.onFinshedHandle = {[weak self] (_, cancel) in
+                    self?.unionTaskCache.removeValue(forKey: key)
                 }
-                unionTaskCache[key] = contextTask!
+                unionTaskCache[key] = unionTask!
             } else {
                 unionTaskCache.removeValue(forKey: key)
             }
             lock.unlock()
         }
-//
-//        func remove(for key: NSString) {
-//            set(contextTask: nil, key: key)
-//        }
     }
     
     public class LoadTask {
@@ -138,14 +153,22 @@ extension SVGAManager {
         }
     }
     
+    
     public class UnionTask {
         var key: NSString
         var sessionTask: URLSessionTask?
         var callBackTasks: [LoadTask] = []
-        var onCancelHandle: ((_ key:NSString) -> Void)?
         var lock: NSLock
         
-        init(task: URLSessionTask, key: NSString, lock: NSLock) {
+        var onFinshedHandle: ((_ key:NSString, _ isCancel: Bool) -> Void)?
+        var isCancel: Bool = false
+        
+        init(key: NSString, lock: NSLock) {
+            self.key = key
+            self.lock = lock
+        }
+        
+        init(task: URLSessionTask?, key: NSString, lock: NSLock) {
             self.key = key
             sessionTask = task
             self.lock = lock
@@ -166,7 +189,8 @@ extension SVGAManager {
             }
             if callBackTasks.count == 0 {
                 sessionTask?.cancel()
-                self.onCancelHandle?(self.key)
+                self.isCancel = true
+                self.onFinshedHandle?(self.key, true)
             }
             lock.unlock()
         }
@@ -175,6 +199,7 @@ extension SVGAManager {
             lock.lock()
             let list = self.callBackTasks
             self.callBackTasks = []
+            self.onFinshedHandle?(self.key, false)
             lock.unlock()
             
             DispatchQueue.main.async {

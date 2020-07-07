@@ -11,6 +11,7 @@
 		4B611EF224AEC215006E7572 /* ListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B611EF124AEC215006E7572 /* ListViewController.swift */; };
 		4BA96AD124AC65B300D39962 /* EmptyState.svga in Resources */ = {isa = PBXBuildFile; fileRef = 4BA96AD024AC65B300D39962 /* EmptyState.svga */; };
 		4BA96AD524AC94E000D39962 /* rose.svga in Resources */ = {isa = PBXBuildFile; fileRef = 4BA96AD424AC94E000D39962 /* rose.svga */; };
+		4BD3A30424B467FB000B0F25 /* binlii.svga in Resources */ = {isa = PBXBuildFile; fileRef = 4BD3A30324B467FB000B0F25 /* binlii.svga */; };
 		607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD51AFB9204008FA782 /* AppDelegate.swift */; };
 		607FACD81AFB9204008FA782 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD71AFB9204008FA782 /* ViewController.swift */; };
 		607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 607FACD91AFB9204008FA782 /* Main.storyboard */; };
@@ -38,6 +39,7 @@
 		4B611EF124AEC215006E7572 /* ListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListViewController.swift; sourceTree = "<group>"; };
 		4BA96AD024AC65B300D39962 /* EmptyState.svga */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = EmptyState.svga; sourceTree = "<group>"; };
 		4BA96AD424AC94E000D39962 /* rose.svga */ = {isa = PBXFileReference; lastKnownFileType = file; path = rose.svga; sourceTree = "<group>"; };
+		4BD3A30324B467FB000B0F25 /* binlii.svga */ = {isa = PBXFileReference; lastKnownFileType = file; path = binlii.svga; sourceTree = "<group>"; };
 		51802462E97ABDD011BF1AF1 /* Pods-SwiftSVGA_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SwiftSVGA_Example.debug.xcconfig"; path = "Target Support Files/Pods-SwiftSVGA_Example/Pods-SwiftSVGA_Example.debug.xcconfig"; sourceTree = "<group>"; };
 		607FACD01AFB9204008FA782 /* SwiftSVGA_Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwiftSVGA_Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		607FACD41AFB9204008FA782 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -114,6 +116,7 @@
 		607FACD31AFB9204008FA782 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				4BD3A30324B467FB000B0F25 /* binlii.svga */,
 				4BA96AD424AC94E000D39962 /* rose.svga */,
 				4BA96AD024AC65B300D39962 /* EmptyState.svga */,
 				607FACD41AFB9204008FA782 /* Info.plist */,
@@ -261,6 +264,7 @@
 				607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */,
 				607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */,
 				4BA96AD124AC65B300D39962 /* EmptyState.svga in Resources */,
+				4BD3A30424B467FB000B0F25 /* binlii.svga in Resources */,
 				4BA96AD524AC94E000D39962 /* rose.svga in Resources */,
 				607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */,
 			);
@@ -348,12 +352,14 @@
 				"${PODS_ROOT}/Reveal-SDK/RevealServer/iOS/RevealServer.framework",
 				"${BUILT_PRODUCTS_DIR}/SwiftProtobuf/SwiftProtobuf.framework",
 				"${BUILT_PRODUCTS_DIR}/SwiftSVGA/SwiftSVGA.framework",
+				"${BUILT_PRODUCTS_DIR}/ZIPFoundation/ZIPFoundation.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RevealServer.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftProtobuf.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftSVGA.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ZIPFoundation.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;

@@ -32,6 +32,7 @@ TODO: Add long description of the pod here.
 
   s.source_files = 'SwiftSVGA/Classes/**/*.swift', 'SwiftSVGA/Classes/**/*'
   s.dependency 'SwiftProtobuf'
+  s.dependency 'ZIPFoundation'
   
   # s.resource_bundles = {
   #   'SwiftSVGA' => ['SwiftSVGA/Assets/*.png']
