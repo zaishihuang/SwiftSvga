@@ -253,12 +253,16 @@ open class SVGAMovieEntity {
     ///   - data: svga data
     ///   - fileURL: data store url use for 1.x
     public convenience init(data: Data, fileURL: URL? = nil) throws {
-        let tag = data.count > 4 ? data.prefix(4) : Data()
+        if data.count < 4 {
+            throw NSError(domain:"SVGAMovieEntity.init", code: NSURLErrorCannotDecodeRawData, userInfo: [NSLocalizedDescriptionKey: "data error"])
+        }
+        
+        let tag = data.prefix(4)
         let tagStr = tag.map { String(format: "%02.2hhx", $0) }.joined()
         if tagStr != "504b0304" {
             let nData = data.zlibInflate()
             let pb = try Svga_MovieEntity.init(serializedData: nData)
-            self.init(pb: pb)
+            self.init(pb: pb, inDirURL: fileURL)
             return
         }
         

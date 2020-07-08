@@ -21,7 +21,13 @@ class Cell: UICollectionViewCell {
     
     func config(_ url: URL?) {
         svgaView.movieEntity = nil
-        svgaView.setURL(url)
+        svgaView.setURL(url) { (svga, error, url) in
+            if let svga = svga {
+                print("==> svga: \(svga.version) \(svga.size) imageCount:\(svga.images.count) sprites:\(svga.sprites.count)")
+            } else {
+                print("==> load error: \(String(describing: error))")
+            }
+        }
     }
 }
 
@@ -44,7 +50,7 @@ class ListViewController: UIViewController {
     lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         
-        let itemWidth = (self.view.frame.size.width - 10) / 2.0
+        let itemWidth = (self.view.frame.size.width - 10)
         layout.itemSize = CGSize(width: itemWidth, height: 160)
   
         

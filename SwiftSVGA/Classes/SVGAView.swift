@@ -152,6 +152,7 @@ open class SVGAView: UIView {
     
     open func startAnimation(at index: Int) {
         if isAnimating { return }
+        if self.window == nil || self.superview == nil { return }
         if index >= totalFrameCount { return }
         
         let needUpdate = drawLayer.isHidden || (curIndex != index)
@@ -365,6 +366,7 @@ extension SVGAView {
             if svga != nil {
                 self?.movieEntity = svga
             }
+            handle?(svga,error,tURL)
         }
         self.task?.cancel()
         self.task = task

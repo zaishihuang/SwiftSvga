@@ -64,18 +64,15 @@ open class SVGAManager: NSObject {
         let loadTask = handle != nil ? unionTask.enqueue(handle: handle) : nil
         
         self.processQueue.async {
-            let unionTask = self.unionTaskCache.get(for: key)
-            if (unionTask == nil) {
-                return
-            }
-            
             do {
                 let svga = try SVGAMovieEntity(fileURL: url)
-                self.cache.setObject(svga, forKey: key)
+                if svga.version.count > 0 {
+                    self.cache.setObject(svga, forKey: key)
+                }
                 
-                unionTask?.finshed(svga: svga, error: nil, url: url)
+                unionTask.finshed(svga: svga, error: nil, url: url)
             } catch {
-                unionTask?.finshed(svga: nil, error: error, url: url)
+                unionTask.finshed(svga: nil, error: error, url: url)
             }
         }
         
@@ -84,19 +81,32 @@ open class SVGAManager: NSObject {
     
     func downloadRemote(url: URL, key: NSString, handle: @escaping CompletionHandler) -> LoadTask? {
         let key = url.absoluteString.md5String() as NSString
+        
         let req = URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad, timeoutInterval: 60)
         
         let unionTask = unionTaskCache.obtained(for: key)
         let loadTask = unionTask.enqueue(handle: handle)
         
-        let task = session.downloadTask(with: req) { (fileURL, rsp, error) in
-            if fileURL != nil {
-                unionTask.sessionTask = nil
-                _ = self.loadLocal(url: fileURL!, key: key, handle: nil)
+        let task = session.dataTask(with: req) { (data, response, error) in
+            unionTask.sessionTask = nil
+            if data != nil {
+                self.processQueue.async {
+                    do {
+                        let svga = try SVGAMovieEntity(data: data!)
+                        if svga.version.count > 0 {
+                            self.cache.setObject(svga, forKey: key)
+                        }
+                    
+                        unionTask.finshed(svga: svga, error: nil, url: url)
+                    } catch {
+                        unionTask.finshed(svga: nil, error: error, url: url)
+                    }
+                }
             } else {
                 unionTask.finshed(svga: nil, error: error, url: url)
             }
         }
+
         unionTask.sessionTask = task
         task.resume()
         return loadTask
