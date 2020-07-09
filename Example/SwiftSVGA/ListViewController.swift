@@ -50,7 +50,7 @@ class ListViewController: UIViewController {
     lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         
-        let itemWidth = (self.view.frame.size.width - 10)
+        let itemWidth = (self.view.frame.size.width - 10) / 2.0
         layout.itemSize = CGSize(width: itemWidth, height: 160)
   
         

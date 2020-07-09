@@ -12,7 +12,7 @@ public typealias CompletionHandler = ((_ svga: SVGAMovieEntity?, _ error: Error?
 open class SVGAManager: NSObject {
     public static let shared = SVGAManager()
     open lazy var session: URLSession = {
-        let path =  "/com.swift.svga.cache"
+        let path =  "com.swift.svga.cache"
         let cache = URLCache(memoryCapacity: 1024 * 1024 * 10, diskCapacity: 1024 * 1024 * 500, diskPath: path)
         let config = URLSessionConfiguration.default
         config.requestCachePolicy = .returnCacheDataElseLoad
