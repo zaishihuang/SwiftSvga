@@ -5,6 +5,8 @@
 [![License](https://img.shields.io/cocoapods/l/SwiftSVGA.svg?style=flat)](https://cocoapods.org/pods/SwiftSVGA)
 [![Platform](https://img.shields.io/cocoapods/p/SwiftSVGA.svg?style=flat)](https://cocoapods.org/pods/SwiftSVGA)
 
+see [https://github.com/svga](https://github.com/svga)
+
 ## Example
 
 To run the example project, clone the repo, and run `pod install` from the Example directory first.
@@ -22,7 +24,7 @@ pod 'SwiftSVGA'
 
 ## Author
 
-zaishi, aaron@micous.com
+zaishi, zaishi.huang@gmail.com
 
 ## License
 
