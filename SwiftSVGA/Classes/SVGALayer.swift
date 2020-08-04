@@ -20,14 +20,14 @@ open class SVGABitmapLayer: CALayer {
         super.init()
         self.masksToBounds = true
         self.backgroundColor = UIColor.clear.cgColor
-        self.contentsGravity = kCAGravityResizeAspect
+        self.contentsGravity = .resizeAspect
     }
     
     required public init?(coder: NSCoder) {
         super.init(coder: coder)
         self.masksToBounds = true
         self.backgroundColor = UIColor.clear.cgColor
-        self.contentsGravity = kCAGravityResizeAspect
+        self.contentsGravity = .resizeAspect
     }
 }
 
@@ -40,8 +40,8 @@ open class SVGAShapeLayer: CAShapeLayer {
         self.fillColor = styles.fillColor?.cgColor
         self.strokeColor = styles.strokeColor?.cgColor ?? UIColor.black.cgColor
         self.lineWidth = styles.strokeWidth
-        self.lineCap = styles.lineCap as String
-        self.lineJoin = styles.lineJoin as String
+        self.lineCap = styles.lineCap
+        self.lineJoin = styles.lineJoin
         self.lineDashPhase = styles.lineDashPhase
         self.lineDashPattern = styles.lineDashPattern as [NSNumber]?
         self.miterLimit = styles.miterLimit

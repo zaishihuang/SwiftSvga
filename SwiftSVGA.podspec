@@ -21,11 +21,11 @@ Pod::Spec.new do |s|
   Swift.SVGA 详情 https://github.com/svga/SVGAPlayer-iOS
                        DESC
 
-  s.homepage         = 'https://github.com/zaishi/SwiftSVGA'
+  s.homepage         = 'https://github.com/zaishihuang/SwiftSVGA'
   # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
-  s.author           = { 'zaishi' => 'aaron@micous.com' }
-  s.source           = { :git => 'https://github.com/zaishi/SwiftSVGA.git', :tag => s.version.to_s }
+  s.author           = { 'zaishi' => 'zaishi.huang@gmail.com' }
+  s.source           = { :git => 'https://github.com/zaishihuang/SwiftSVGA.git', :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
   s.ios.deployment_target = '9.0'
@@ -33,6 +33,9 @@ Pod::Spec.new do |s|
   s.source_files = 'SwiftSVGA/Classes/**/*.swift', 'SwiftSVGA/Classes/**/*'
   s.dependency 'SwiftProtobuf'
   s.dependency 'ZIPFoundation'
+  
+  s.requires_arc = true
+  s.swift_versions = ['4.0', '4.2', '5.0']
   
   # s.resource_bundles = {
   #   'SwiftSVGA' => ['SwiftSVGA/Assets/*.png']

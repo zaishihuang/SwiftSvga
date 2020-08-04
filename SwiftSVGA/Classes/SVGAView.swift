@@ -138,7 +138,7 @@ open class SVGAView: UIView {
             
             if displayLink == nil {
                 displayLink = CADisplayLink(target: WeakLinkDelegate(self), selector: #selector(step(link:)))
-                displayLink?.add(to: RunLoop.main, forMode: .commonModes)
+                displayLink?.add(to: RunLoop.main, forMode: RunLoop.Mode.common)
                 displayLink?.isPaused = true
             }
             displayLink?.frameInterval = 60 / max(movieEntity!.fps, 1)

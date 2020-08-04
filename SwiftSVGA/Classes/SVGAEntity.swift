@@ -130,8 +130,8 @@ open class SVGAShapeEntity {
         public var strokeColor: UIColor?
         public var strokeWidth: CGFloat = 0
         public var miterLimit: CGFloat = 0
-        public var lineCap: CAShapeLayerLineCap = kCALineCapButt as CAShapeLayerLineCap
-        public var lineJoin: CAShapeLayerLineJoin = kCALineJoinMiter as CAShapeLayerLineJoin
+        public var lineCap: CAShapeLayerLineCap = .butt
+        public var lineJoin: CAShapeLayerLineJoin = .miter
         
         public var lineDashPhase: CGFloat = 0
         public var lineDashPattern: [CGFloat]?
@@ -150,11 +150,11 @@ open class SVGAShapeEntity {
             strokeWidth = CGFloat(pb.strokeWidth)
             miterLimit = CGFloat(pb.miterLimit)
             
-            let capList = [kCALineCapButt,kCALineCapRound, kCALineCapSquare, kCALineCapButt, kCALineCapButt]
-            let linJoinList = [kCALineJoinMiter,kCALineJoinRound, kCALineJoinBevel, kCALineJoinMiter, kCALineJoinMiter]
+            let capList:[CAShapeLayerLineCap]  = [.butt , .round, .square, .butt, .butt]
+            let linJoinList:[CAShapeLayerLineJoin] = [.miter ,.round, .bevel, .miter, .miter]
             
-            lineCap = capList[pb.lineCap.rawValue] as CAShapeLayerLineCap
-            lineJoin = linJoinList[pb.lineJoin.rawValue] as CAShapeLayerLineJoin
+            lineCap = capList[pb.lineCap.rawValue]
+            lineJoin = linJoinList[pb.lineJoin.rawValue]
             lineDashPhase = CGFloat(pb.lineDashIii)
             lineDashPattern = [CGFloat(max(pb.lineDashI, 1.0)),
                                CGFloat(max(pb.lineDashIi, 0.1))]
