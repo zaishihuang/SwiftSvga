@@ -19,8 +19,14 @@ open class SVGASpriteEntity {
         imageKey = pb.imageKey
         matteKey = pb.matteKey
         
+        var tFrame: SVGAFrameEntity?
         frames = pb.frames.compactMap({ (pbFrame) -> SVGAFrameEntity? in
-            return SVGAFrameEntity(pb: pbFrame)
+            let frame = SVGAFrameEntity(pb: pbFrame)
+            if frame?.isKeepShaps == true {
+                frame?.shapes = tFrame?.shapes ?? []
+            }
+            tFrame = frame
+            return frame
         })
     }
     
@@ -41,6 +47,7 @@ open class SVGAFrameEntity {
     open lazy var clipBezierPath: UIBezierPath? = {
        return UIBezierPath(svgaPaths: clipPath)
     }()
+    open var isKeepShaps: Bool = false // 与前帧一致
     
     init?(pb: Svga_FrameEntity) {
         alpha = CGFloat(pb.alpha)
@@ -60,6 +67,7 @@ open class SVGAFrameEntity {
         shapes = pb.shapes.compactMap({ (pbShape) -> SVGAShapeEntity? in
             return SVGAShapeEntity(pb: pbShape)
         })
+        isKeepShaps = (shapes.first?.type == SVGAShapeEntity.ShapeType.keep)
         
         let llx = transform.a * layout.origin.x + transform.c * layout.origin.y + transform.tx;
         let lrx = transform.a * (layout.origin.x + layout.size.width) + transform.c * layout.origin.y + transform.tx;
