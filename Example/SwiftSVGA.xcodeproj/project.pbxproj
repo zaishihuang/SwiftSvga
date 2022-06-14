@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		2E55235C715607E6F7A06AE4 /* Pods_SwiftSVGA_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B4A4E2C82F423FA721594D10 /* Pods_SwiftSVGA_Example.framework */; };
 		4B611EF224AEC215006E7572 /* ListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B611EF124AEC215006E7572 /* ListViewController.swift */; };
+		4B97CF8F283E212A00A7DE1B /* FRAME_GIRL.png in Resources */ = {isa = PBXBuildFile; fileRef = 4B97CF8D283E212A00A7DE1B /* FRAME_GIRL.png */; };
+		4B97CF90283E212A00A7DE1B /* FRAME_BOY.png in Resources */ = {isa = PBXBuildFile; fileRef = 4B97CF8E283E212A00A7DE1B /* FRAME_BOY.png */; };
+		4B97CF91283E225F00A7DE1B /* cpframe.svga in Resources */ = {isa = PBXBuildFile; fileRef = 4B97CF8C283E210100A7DE1B /* cpframe.svga */; };
 		4BA96AD124AC65B300D39962 /* EmptyState.svga in Resources */ = {isa = PBXBuildFile; fileRef = 4BA96AD024AC65B300D39962 /* EmptyState.svga */; };
 		4BA96AD524AC94E000D39962 /* rose.svga in Resources */ = {isa = PBXBuildFile; fileRef = 4BA96AD424AC94E000D39962 /* rose.svga */; };
 		4BD3A30424B467FB000B0F25 /* binlii.svga in Resources */ = {isa = PBXBuildFile; fileRef = 4BD3A30324B467FB000B0F25 /* binlii.svga */; };
@@ -37,6 +40,9 @@
 		2E5E37E8EBCC5A85EC096811 /* Pods-SwiftSVGA_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SwiftSVGA_Tests.release.xcconfig"; path = "Target Support Files/Pods-SwiftSVGA_Tests/Pods-SwiftSVGA_Tests.release.xcconfig"; sourceTree = "<group>"; };
 		4970C0B38EDA498878DD6485 /* Pods-SwiftSVGA_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SwiftSVGA_Example.release.xcconfig"; path = "Target Support Files/Pods-SwiftSVGA_Example/Pods-SwiftSVGA_Example.release.xcconfig"; sourceTree = "<group>"; };
 		4B611EF124AEC215006E7572 /* ListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListViewController.swift; sourceTree = "<group>"; };
+		4B97CF8C283E210100A7DE1B /* cpframe.svga */ = {isa = PBXFileReference; lastKnownFileType = file; path = cpframe.svga; sourceTree = "<group>"; };
+		4B97CF8D283E212A00A7DE1B /* FRAME_GIRL.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = FRAME_GIRL.png; sourceTree = "<group>"; };
+		4B97CF8E283E212A00A7DE1B /* FRAME_BOY.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = FRAME_BOY.png; sourceTree = "<group>"; };
 		4BA96AD024AC65B300D39962 /* EmptyState.svga */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = EmptyState.svga; sourceTree = "<group>"; };
 		4BA96AD424AC94E000D39962 /* rose.svga */ = {isa = PBXFileReference; lastKnownFileType = file; path = rose.svga; sourceTree = "<group>"; };
 		4BD3A30324B467FB000B0F25 /* binlii.svga */ = {isa = PBXFileReference; lastKnownFileType = file; path = binlii.svga; sourceTree = "<group>"; };
@@ -116,7 +122,10 @@
 		607FACD31AFB9204008FA782 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				4B97CF8E283E212A00A7DE1B /* FRAME_BOY.png */,
+				4B97CF8D283E212A00A7DE1B /* FRAME_GIRL.png */,
 				4BD3A30324B467FB000B0F25 /* binlii.svga */,
+				4B97CF8C283E210100A7DE1B /* cpframe.svga */,
 				4BA96AD424AC94E000D39962 /* rose.svga */,
 				4BA96AD024AC65B300D39962 /* EmptyState.svga */,
 				607FACD41AFB9204008FA782 /* Info.plist */,
@@ -263,8 +272,11 @@
 			files = (
 				607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */,
 				607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */,
+				4B97CF8F283E212A00A7DE1B /* FRAME_GIRL.png in Resources */,
 				4BA96AD124AC65B300D39962 /* EmptyState.svga in Resources */,
+				4B97CF90283E212A00A7DE1B /* FRAME_BOY.png in Resources */,
 				4BD3A30424B467FB000B0F25 /* binlii.svga in Resources */,
+				4B97CF91283E225F00A7DE1B /* cpframe.svga in Resources */,
 				4BA96AD524AC94E000D39962 /* rose.svga in Resources */,
 				607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */,
 			);

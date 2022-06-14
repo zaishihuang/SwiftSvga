@@ -7,6 +7,7 @@
 
 import UIKit
 import QuartzCore
+import SwiftProtobuf
 
 open class SVGAView: UIView {
     public typealias OnDidLoadHandle = ((_ view: SVGAView, _ svga: SVGAMovieEntity?) -> Void)
@@ -118,6 +119,8 @@ open class SVGAView: UIView {
         resize()
         
         if movieEntity != nil {
+            // matteLayer map
+            var tmpMatteLayerMap: [String: SVGASpriteLayer] = [:]
             spriteLayers = movieEntity?.sprites.compactMap({ (spriteEntity) -> SVGASpriteLayer? in
                 let key = spriteEntity.imageKey
                 let layer: SVGASpriteLayer = {
@@ -129,7 +132,23 @@ open class SVGAView: UIView {
                 layer.spriteEntity = spriteEntity
                 layer.image = dynamicImages[key] ?? movieEntity?.image(for: key)
                 layer.dynamicHidden = dynamicHiddens[key] ?? false
-                drawLayer.addSublayer(layer)
+                
+                // 该图层是蒙层
+                if key.hasSuffix(".matte") {
+                    tmpMatteLayerMap[key] = layer
+                } else {
+                    // 该图层有蒙层
+                    if spriteEntity.matteKey.count > 0 {
+                        let matteLayer = tmpMatteLayerMap[spriteEntity.matteKey]
+                        // 这里需要一个容器，图层内部也有遮罩
+                        let containerLayer = CALayer()
+                        containerLayer.mask = matteLayer
+                        containerLayer.addSublayer(layer)
+                        drawLayer.addSublayer(containerLayer)
+                    } else {
+                        drawLayer.addSublayer(layer)
+                    }
+                }
                 
                 return layer
             }) ?? []
@@ -314,7 +333,7 @@ protocol SVGAViewDynamicable {
 }
 
 extension SVGAView: SVGAViewDynamicable {
-    func setImage(_ image:UIImage?, key:String) {
+    open func setImage(_ image:UIImage?, key:String) {
         if image == nil {
             dynamicImages.removeValue(forKey: key)
         } else {
@@ -328,7 +347,7 @@ extension SVGAView: SVGAViewDynamicable {
         }
     }
     
-    func setHidden(_ hidden:Bool, key:String) {
+    open func setHidden(_ hidden:Bool, key:String) {
         dynamicHiddens[key] = hidden
         spriteLayers.filter { (layer) -> Bool in
             return layer.spriteEntity?.imageKey == key
@@ -337,7 +356,7 @@ extension SVGAView: SVGAViewDynamicable {
         }
     }
     
-    func clearDynamic() {
+    open func clearDynamic() {
         dynamicHiddens = [:]
         dynamicImages = [:]
     }

@@ -16,9 +16,11 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         
-        svgaView.frame = CGRect(x: 0, y: 100, width: self.view.frame.size.width, height: 300)
+        svgaView.frame = self.view.bounds
         svgaView.layer.borderWidth = 1
         self.view.addSubview(svgaView)
+        svgaView.contentMode = .scaleAspectFill
+        svgaView.isUserInteractionEnabled = false
                 
         svgaView.fillModel = .forwards
         svgaView.totalLoop = 10
@@ -44,10 +46,16 @@ class ViewController: UIViewController {
 
     func config() {
 //        let url = Bundle.main.url(forResource: "EmptyState", withExtension: "svga")
-        let url = Bundle.main.url(forResource: "rose", withExtension: "svga")
+        let url = Bundle.main.url(forResource: "cpframe", withExtension: "svga")
 //        let url = Bundle.main.url(forResource: "binlii", withExtension: "svga")
 //        let url = URL(string: "http://github.com/yyued/SVGA-Samples/blob/master/HamburgerArrow.svga?raw=true")
         svgaView.setURL(url)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+            
+            self.svgaView.setImage(UIImage(named: "FRAME_BOY"), key: "FRAME_BOY_BLUE")
+        }
+        svgaView.setImage(UIImage(named: "FRAME_GIRL"), key: "FRAME_GIRL_RED")
+        
     }
     
     @IBAction func onTapChange(_ sender: Any) {

@@ -34,7 +34,7 @@ class Cell: UICollectionViewCell {
 class ListViewController: UIViewController {
 
     lazy var items: [String] = [
-                               "https://github.com/yyued/SVGA-Samples/blob/master/EmptyState.svga?raw=true",
+//                               "https://github.com/yyued/SVGA-Samples/blob/master/EmptyState.svga?raw=true",
                                "http://github.com/yyued/SVGA-Samples/blob/master/HamburgerArrow.svga?raw=true",
                                "https://github.com/yyued/SVGA-Samples/blob/master/PinJump.svga?raw=true",
                            
@@ -45,6 +45,7 @@ class ListViewController: UIViewController {
                                "https://github.com/yyued/SVGA-Samples/blob/master/kingset.svga?raw=true",
                                "https://github.com/yyued/SVGA-Samples/blob/master/posche.svga?raw=true",
                                "https://github.com/yyued/SVGA-Samples/blob/master/rose.svga?raw=true",
+                               "https://github.com/yyued/SVGA-Samples/blob/master/EmptyState.svga?raw=true",
                                ]
     
     lazy var collectionView: UICollectionView = {

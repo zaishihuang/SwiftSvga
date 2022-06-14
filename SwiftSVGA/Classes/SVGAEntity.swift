@@ -12,6 +12,7 @@ import ZIPFoundation
 open class SVGASpriteEntity {
     /// 元件所对应的位图键名, 如果 imageKey 含有 .vector 后缀，该 sprite 为矢量图层 含有 .matte 后缀，该 sprite 为遮罩图层。
     open var imageKey: String = ""
+    /// 被遮罩图层的 matteKey 对应的是其遮罩图层的 imageKey.
     open var matteKey: String = ""
     open var frames: [SVGAFrameEntity] = []
     

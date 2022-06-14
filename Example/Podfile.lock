@@ -6,7 +6,7 @@ PODS:
     - FBSnapshotTestCase/Core
   - Reveal-SDK (24)
   - SwiftProtobuf (1.10.2)
-  - SwiftSVGA (1.0.0):
+  - SwiftSVGA (1.0.1):
     - SwiftProtobuf
     - ZIPFoundation
   - ZIPFoundation (0.9.11)
@@ -31,9 +31,9 @@ SPEC CHECKSUMS:
   FBSnapshotTestCase: 094f9f314decbabe373b87cc339bea235a63e07a
   Reveal-SDK: 5d7e56b8f018c0a88b3a2c10bf68d598bbd3b071
   SwiftProtobuf: bec1ae7d686ff73dd09d79866154f4970b891410
-  SwiftSVGA: 9b6a675dc3a45b2610eed498c545628f8efc6886
+  SwiftSVGA: 9a9b89de4d7b99900d51061a6f1070a19ea4612a
   ZIPFoundation: b1f0de4eed33e74a676f76e12559ab6b75990197
 
 PODFILE CHECKSUM: 29b4f0a1619c2bb58426f7c9942da67060120665
 
-COCOAPODS: 1.9.3
+COCOAPODS: 1.11.2

@@ -89,7 +89,8 @@ open class SVGASpriteLayer: CALayer {
     
     override open var frame: CGRect {
         didSet {
-             bitmapLayer?.frame = self.bounds
+            bitmapLayer?.frame = self.bounds
+            vectorLayer?.frame = self.bounds
         }
     }
     
